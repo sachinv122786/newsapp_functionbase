@@ -1,4 +1,4 @@
-import { useEffect,useState } from "react";
+import React,{ useEffect,useState } from "react";
 import NewsItems from "./NewsItems";
 import Spinner from "./Spinner";
 import PropTypes from "prop-types";
@@ -8,12 +8,10 @@ import InfiniteScroll from "react-infinite-scroll-component";
 const News =(props)=> {
   const [articles,setArticles] =  useState([])
   const [page,setPage] =  useState(1)
-  const [loading,setLoading] =  useState(false)
+  const [loading,setLoading] =  useState(true)
   const [totalarticles,setTotalarticles] =  useState(0)
 
-  // document.title = `${capitaliFirstLetter(
-  //   props.category
-  // )} - NewsApp`;
+ 
   const capitaliFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
@@ -26,14 +24,15 @@ const News =(props)=> {
     fetch(url)
       .then((res) => res.json())
       .then((result) => {
-        setArticles(articles,result.articles)
+        setArticles(result.articles)
         setLoading(false)
-        setTotalarticles(totalarticles,result.totalarticles)
+        setTotalarticles(result.totalarticles)
         props.setProgress(100);
       });
   }
 
   useEffect(()=>{
+     document.title = `${capitaliFirstLetter(props.category)} - NewsApp`;
     updateNews();
   },[])
   
@@ -48,20 +47,20 @@ const News =(props)=> {
 //   };
 
   const fetchMoreData = async () => {
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&page=${page+1}&category=${props.category}&apiKey=b435ef2ee4324425ace5c9a5de0dbca9&pageSize=${props.pageSize}`;
     setPage(page + 1 );
-    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&page=${page}&category=${props.category}&apiKey=b435ef2ee4324425ace5c9a5de0dbca9&pageSize=${props.pageSize}`;
     fetch(url)
       .then((res) => res.json())
       .then((result) => {
         setArticles(articles.concat(result.articles))
         setLoading(false)
-        setTotalarticles(totalarticles,result.totalarticles)
+        setTotalarticles(result.totalarticles)
       });
   };
 
     return (
       <>
-        <h1 className="text-center" style={{ margin: "35px 0px" }}>
+        <h1 className="text-center" style={{ margin: "35px 0px",marginTop:"90px" }}>
           NewApp -Top {capitaliFirstLetter(props.category)} Headlines
         </h1>
         {/* {loading && <Spinner />} */}
@@ -75,7 +74,6 @@ const News =(props)=> {
           <div className="container">
             <div className="row">
               {articles.map((element) => {
-                console.log(element.title)
                 return (
                   <div className="col-md-3" key={element.url}>
                     <NewsItems
